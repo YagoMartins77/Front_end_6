@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Pizzaria Fatec - Escolha seu Sabor</title>
+
+    <!-- ÁREA DO CSS -->
+    <style>
+        /* 1. RESET BÁSICO */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* 2. ESTILO DO CABEÇALHO */
+        .cabecalho-principal {
+            background-color: #d32f2f;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .menu a:hover {
+            color: #ffc107;
+        }
+
+        /* 3. CONTEÚDO PRINCIPAL */
+        .conteudo-principal {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .titulo-pagina {
+            margin-bottom: 30px;
+            color: #d32f2f;
+        }
+
+        /* 4. FLEXBOX DA GRADE DE PIZZAS */
+        .grade-de-pizzas {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* 5. ESTILO DO CARTÃO DE PIZZA */
+        .cartao-pizza {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .cartao-pizza:hover {
+            transform: translateY(-10px);
+        }
+
+        .cartao-pizza img {
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .sabor-nome {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .sabor-ingredientes {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            height: 40px;
+        }
+
+        .sabor-preco {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 20px;
+        }
+
+        /* 6. ESTILO DOS BOTÕES */
+        .botao-pedir {
+            display: inline-block;
+            background-color: #ff9800;
+            color: #000;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .botao-pedir:hover {
+            background-color: #e68a00;
+        }
+
+        .secao-carrinho {
+            max-width: 600px;
+            margin: 40px auto 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        .secao-carrinho h2 {
+            color: #d32f2f;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 10px;
+        }
+
+        #lista-carrinho {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .item-carrinho {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .btn-remover {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-remover:hover {
+            background-color: #b71c1c;
+        }
+
+        #total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2e7d32;
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        /* Botão Finalizar Pedido */
+        .btn-finalizar {
+            display: block;
+            width: 100%;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: center;
+        }
+
+        .btn-finalizar:hover {
+            background-color: #1b5e20;
+        }
+
+        /* ================================================================
+           CRITÉRIO DE AVALIAÇÃO: MODAL ESTILIZADO CORRETAMENTE (CSS)
+        ================================================================ */
+        /* Overlay: Fundo escurecido que cobre toda a tela */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Preto com 60% de opacidade */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            
+            /* REQUISITO: Oculto por padrão no CSS */
+            display: none; 
+        }
+
+        /* Caixa interna do Modal */
+        .modal {
+            background-color: white;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: surgirModal 0.3s ease-out;
+        }
+
+        @keyframes surgirModal {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h3 {
+            color: #d32f2f;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .modal-lista {
+            list-style: none;
+            max-height: 200px;
+            overflow-y: auto; /* Adiciona barra de rolagem se forem muitas pizzas */
+            margin-bottom: 15px;
+        }
+
+        .modal-lista li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 0.95rem;
+        }
+
+        .modal-resumo-valores {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .modal-resumo-valores p {
+            margin-bottom: 5px;
+        }
+
+        /* Container de botões do modal */
+        .modal-botoes {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .btn-confirmar {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-fechar {
+            background-color: #757575;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-confirmar:hover { background-color: #1b5e20; }
+        .btn-fechar:hover { background-color: #616161; }
+
+        /* ================================================================
+           ATIVIDADE 4: ESTILOS DO FORMULÁRIO DE CONTATO
+        ================================================================ */
+        .secao-contato {
+            max-width: 600px;
+            margin: 60px auto 40px auto; /* Afasta bem do carrinho */
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        .secao-contato h2 {
+            color: #d32f2f;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .grupo-form {
+            margin-bottom: 20px;
+        }
+
+        .grupo-form label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .grupo-form input,
+        .grupo-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        /* CRITÉRIO UX: Destaque ao clicar no campo */
+        .grupo-form input:focus,
+        .grupo-form textarea:focus {
+            border-color: #d32f2f;
+            outline: none;
+        }
+
+        /* REQUISITO: Mensagens de erro visíveis abaixo dos campos */
+        .erro-msg {
+            color: #d32f2f;
+            font-size: 0.85rem;
+            display: block;
+            margin-top: 5px;
+            min-height: 15px; /* Evita que a tela pule quando a mensagem aparece */
+        }
+
+        /* CRITÉRIO UX: Borda vermelha no campo com erro */
+        .input-erro {
+            border-color: #d32f2f !important;
+            background-color: #fff8f8;
+        }
+
+        .btn-enviar {
+            width: 100%;
+            background-color: #ff9800;
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-enviar:hover {
+            background-color: #e68a00;
+        }
+
+        /* 7. RODAPÉ */
+        .rodape-principal {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CABEÇALHO DO SITE -->
+    <header class="cabecalho-principal">
+        <div class="logo">
+            <h2>🍕 Fatec Pizza</h2>
+        </div>
+        <nav class="menu">
+            <ul>
+                <li><a href="#inicio">Início</a></li>
+                <li><a href="#cardapio">Cardápio</a></li>
+                <li><a href="#contato">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="conteudo-principal">
+        <h1 class="titulo-pagina">Nosso Cardápio</h1>
+
+        <!-- CONTAINER DAS PIZZAS -->
+        <div class="grade-de-pizzas">
+            <article class="cartao-pizza">
+                <img src="Foto pizza calabresa.png" alt="Foto da Pizza de Calabresa">
+                <h2 class="sabor-nome">Calabresa Clássica</h2>
+                <p class="sabor-ingredientes">Massa fina, molho de tomate, muita calabresa e cebola fatiada.</p>
+                <p class="sabor-preco">R$ 45,00</p>
+                <a href="#carrinho" class="botao-pedir" data-sabor="Calabresa Clássica" data-preco="45.00">Pedir Agora</a>
+            </article>
+
+            <article class="cartao-pizza">
+                <img src="Foto pizza Margherita.png" alt="Foto da Pizza Margherita">
+                <h2 class="sabor-nome">Margherita Especial</h2>
+                <p class="sabor-ingredientes">Mussarela fresca, tomate, manjericão e um fio de azeite.</p>
+                <p class="sabor-preco">R$ 50,00</p>
+                <a href="#carrinho" class="botao-pedir" data-sabor="Margherita Especial" data-preco="50.00">Pedir Agora</a>
+            </article>
+
+            <article class="cartao-pizza">
+                <img src="Foto pizzza frango.png" alt="Foto da Pizza de Frango">
+                <h2 class="sabor-nome">Frango com Catupiry</h2>
+                <p class="sabor-ingredientes">Frango desfiado temperado coberto com autêntico Catupiry.</p>
+                <p class="sabor-preco">R$ 55,00</p>
+                <a href="#carrinho" class="botao-pedir" data-sabor="Frango com Catupiry" data-preco="55.00">Pedir Agora</a>
+            </article>
+        </div>
+
+        <!-- SEÇÃO DO CARRINHO -->
+        <section id="carrinho" class="secao-carrinho">
+            <h2>🛒 Seu Carrinho</h2>
+            <ul id="lista-carrinho">
+                <!-- Injetado dinamicamente via JS -->
+            </ul>
+            <div id="total">Total: R$ 0.00</div>
+            
+            <!-- REQUISITO: Adicionar um botão “Finalizar Pedido” que abre o modal -->
+            <button class="btn-finalizar" onclick="abrirModal()">Finalizar Pedido</button>
+        </section>
+        <!-- ================================================================
+           ATIVIDADE 4: SEÇÃO DE CONTATO
+        ================================================================ -->
+        <section id="contato" class="secao-contato">
+            <h2>📞 Fale Conosco</h2>
+            <!-- A tag novalidate desativa o aviso feio padrão do navegador para usarmos os nossos -->
+            <form id="form-contato" novalidate>
+                <div class="grupo-form">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" placeholder="Digite seu nome completo">
+                    <span class="erro-msg" id="erro-nome"></span>
+                </div>
+                
+                <div class="grupo-form">
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" name="email" placeholder="exemplo@email.com">
+                    <span class="erro-msg" id="erro-email"></span>
+                </div>
+                
+                <div class="grupo-form">
+                    <label for="mensagem">Mensagem:</label>
+                    <textarea id="mensagem" name="mensagem" rows="4" placeholder="Como podemos ajudar?"></textarea>
+                    <span class="erro-msg" id="erro-mensagem"></span>
+                </div>
+                
+                <button type="submit" class="btn-enviar">Enviar Mensagem</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- REQUISITO: Criar um overlay escurecido com a div do modal -->
+    <div id="modal-container" class="modal-overlay">
+        <div class="modal">
+            <h3>📋 Resumo do Pedido</h3>
+            
+            <!-- REQUISITO: Lista de pizzas -->
+            <ul id="modal-lista-pizzas" class="modal-lista"></ul>
+            
+            <!-- REQUISITO: Quantidade total e Soma final -->
+            <div class="modal-resumo-valores">
+                <p><strong>Quantidade Total:</strong> <span id="modal-qtd-total">0</span> itens</p>
+                <p><strong>Soma Final:</strong> <span id="modal-soma-final">R$ 0.00</span></p>
+            </div>
+            
+            <!-- REQUISITO: Criar botões “Confirmar” e “Fechar Modal” -->
+            <div class="modal-botoes">
+                <button class="btn-fechar" onclick="fecharModal()">Fechar Modal</button>
+                <button class="btn-confirmar" onclick="confirmarPedido()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="rodape-principal">
+        <p>&copy; 2026 Pizzaria Fatec Pompéia. Todos os direitos reservados.</p>
+        <p>Desenvolvido pelos alunos de Sistemas Inteligentes.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
